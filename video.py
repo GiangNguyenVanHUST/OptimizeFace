@@ -114,17 +114,8 @@ class Analyzer:
                             # NOTE - bounding box for the face
                             left, top, right, bottom = tuple(
                                 face.bbox.astype(int).flatten())
-                            # if left < 0:
-                            #     left = 1
-                            # if top < 0:
-                            #     top = 1
-                            # if right > width:
-                            #     right = width - 1
-                            # if bottom > height:
-                            #     bottom = height - 1
 
                             embedding = face.embedding.flatten()
-                            # ANCHOR - bottleneck?
                             closest_indices, distances = self.annoy.get_nns_by_vector(
                                 embedding, n=1, include_distances=True)
                             similarity = (2. - distances[0] ** 2) / 2.
