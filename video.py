@@ -100,6 +100,10 @@ class Analyzer:
                             frame, (0, 0), fx=0.25, fy=0.25)
                         faces = self.face_model.get(small_frame)
 
+                        if len(faces) <= 0:
+                            output_movie.write(frame)
+                            continue
+
                         if len(faces) > 0:
                             timestamp = time.time() - start_time
                             print(
