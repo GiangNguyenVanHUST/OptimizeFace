@@ -6,7 +6,7 @@ File video.py là một file Python có khả năng nhận vào một tập hợ
 
 ## Hướng dẫn cài đặt
 
-Trước hết, ta cần phải cài đặt Python 3 (code này được viết với Python 3.10.2, nếu muốn dùng những tính năng liên quan tới type checking trong class Analyzer, ta nên sử dụng Python 3.6 hoặc 3.7).
+Trước hết, ta cần phải cài đặt Python 3 (khuyên dùng 3.6 và 3.7).
 
 Sau đó, cài đặt tất cả các package trong file `requirements.txt` bằng câu lệnh `pip install -r requirements.txt`
 
