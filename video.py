@@ -13,13 +13,6 @@ from sys import argv
 
 
 class Analyzer:
-    f: int  # number of dimensions
-    annoy: AnnoyIndex
-    face_mode: FaceAnalysis
-    id_mapping: dict[str, str]
-    name_mapping: str
-    DETECT_THRESHOLD: float
-
     def __init__(self, f=512):
         self.f = 512
         self.annoy = AnnoyIndex(f, 'angular')
