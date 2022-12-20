@@ -49,7 +49,7 @@ class Analyzer:
         print("[DEBUG] extract successful")
 
     def analyze(self, video_path, sub_dir, video_id='', outputs_video=False):
-        """ Analyze video
+        """ Analyze a given video
 
         Args:
             video_path  : video full path
