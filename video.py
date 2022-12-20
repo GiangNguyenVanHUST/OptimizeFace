@@ -55,7 +55,7 @@ class Analyzer:
         self.annoy.build(200)
         print("[DEBUG] extract successful")
 
-    def analyze(self, video_path, sub_dir, video_id=''):
+    def analyze(self, video_path, sub_dir, video_id='', outputs_video=False):
         """ Analyze video
 
         Args:
@@ -73,7 +73,18 @@ class Analyzer:
         cap = CamGear(source=video_path).start()
         frame_rate = cap.framerate
 
-        output_movie = WriteGear(output_filename="output.mp4")
+        if not os.path.exists('output'):
+            os.mkdir('output')
+
+        if outputs_video:
+            font = cv2.FONT_HERSHEY_DUPLEX
+            video_file = video_path.split('/')[-1]
+            video_name_tokens = video_file.split('.')[:-1]
+            video_name = ".".join(video_name_tokens)
+            print('video_name:', video_name)
+
+            output_movie = WriteGear(
+                output_filename=f"./output/{video_name}_output.mp4")
 
         start_time = time.time()
 
@@ -100,7 +111,8 @@ class Analyzer:
                         faces = self.face_model.get(small_frame)
 
                         if len(faces) <= 0:
-                            output_movie.write(frame)
+                            if outputs_video:
+                                output_movie.write(frame)
                             continue
 
                         if len(faces) > 0:
@@ -140,14 +152,17 @@ class Analyzer:
                                     writer = WriteGear(
                                         output_filename=path_to_save, compression_mode=False)
                                     writer.write(crop_img)
+                                    timecode = frame_id / frame_rate
+                                    results.append(
+                                        (dossier_id, path_to_save, timecode))
 
-                                cv2.rectangle(frame, (left * 4, top * 4),
-                                              (right * 4, bottom * 4), (0, 255, 0), 2)
-                                cv2.rectangle(frame, (left * 4, bottom * 4 + 10),
-                                              (right * 4, bottom * 4), (0, 255, 0), cv2.FILLED)
-                                font = cv2.FONT_HERSHEY_DUPLEX
-                                cv2.putText(frame, dossier_id, (left * 4 + 6, bottom * 4 - 6),
-                                            font, 0.5, (255, 255, 255), 1)
+                                if outputs_video:
+                                    cv2.rectangle(frame, (left * 4, top * 4),
+                                                  (right * 4, bottom * 4), (0, 255, 0), 2)
+                                    cv2.rectangle(frame, (left * 4, bottom * 4 + 10),
+                                                  (right * 4, bottom * 4), (0, 255, 0), cv2.FILLED)
+                                    cv2.putText(frame, dossier_id, (left * 4 + 6, bottom * 4 - 6),
+                                                font, 0.5, (255, 255, 255), 1)
 
                         for person in on_screen:
                             if person not in seen_faces:
@@ -156,10 +171,15 @@ class Analyzer:
                                 # del tagged_trackers[person]
 
                         on_screen = seen_faces
-                        output_movie.write(frame)
+
+                        if outputs_video:
+                            output_movie.write(frame)
             finally:
                 cap.stop()
-                output_movie.close()
+
+                if outputs_video:
+                    output_movie.close()
+
                 analysis_length = time.time() - start_time
                 print(f"[INFO] finished video analysis in {analysis_length}")
 
@@ -173,4 +193,4 @@ if __name__ == '__main__':
 
     analyzer = Analyzer()
     analyzer.embedding_extract(img_folder, img_folder)
-    analyzer.analyze(video_path, 'dossier', video_id)
+    analyzer.analyze(video_path, 'dossier', video_id, outputs_video=True)
