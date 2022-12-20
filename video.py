@@ -70,10 +70,7 @@ class Analyzer:
         cap = CamGear(source=video_path).start()
         frame_rate = cap.framerate
 
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        print(cap.frame.shape)
-        output_movie = cv2.VideoWriter(
-            'output.mp4', fourcc, frame_rate, (cap.frame.shape[1], cap.frame.shape[0]))
+        output_movie = WriteGear(output_filename="output.mp4")
 
         start_time = time.time()
 
@@ -94,7 +91,6 @@ class Analyzer:
 
                     if frame_id % 5 == 0:
                         captured += 1
-                        width, height, _ = frame.shape
                         # evaluate bottleneck
                         small_frame = cv2.resize(
                             frame, (0, 0), fx=0.25, fy=0.25)
@@ -116,17 +112,16 @@ class Analyzer:
                                 continue
 
                             # NOTE - bounding box for the face
-                            # NOTE - maybe remove anything that's not needed?
                             left, top, right, bottom = tuple(
                                 face.bbox.astype(int).flatten())
-                            if left < 0:
-                                left = 1
-                            if top < 0:
-                                top = 1
-                            if right > width:
-                                right = width - 1
-                            if bottom > height:
-                                bottom = height - 1
+                            # if left < 0:
+                            #     left = 1
+                            # if top < 0:
+                            #     top = 1
+                            # if right > width:
+                            #     right = width - 1
+                            # if bottom > height:
+                            #     bottom = height - 1
 
                             embedding = face.embedding.flatten()
                             # ANCHOR - bottleneck?
@@ -170,6 +165,7 @@ class Analyzer:
                         output_movie.write(frame)
             finally:
                 cap.stop()
+                output_movie.close()
                 analysis_length = time.time() - start_time
                 print(f"[INFO] finished video analysis in {analysis_length}")
 
