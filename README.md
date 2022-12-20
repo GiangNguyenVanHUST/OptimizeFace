@@ -23,6 +23,3 @@ Ta cần phải truyền ít nhất 2 command-line arguments theo thứ tự nh�
 - img_folder: command-line argument đầu tiên sau video.py. Đây là thư mục chứa hình ảnh của các nhân vật mà ta cần nhận diện trong video.
 - video_path: command-line argument thứ 2 sau video.py. Đây là path dẫn tới video mà chúng ta cần xử lý.
 - video_id: command-line argument thứ 3 sau video.py, không bắt buộc. Đây là id của video; trong trường hợp chúng ta để trống, giá trị mặc định của video_id sẽ là giá trị của img_folder.
-
-
-

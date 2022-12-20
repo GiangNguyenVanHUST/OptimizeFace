@@ -25,6 +25,8 @@ class Analyzer:
         self.annoy = AnnoyIndex(f, 'angular')
         self.face_model = insightface.app.FaceAnalysis()
         self.face_model.prepare(ctx_id=-1, det_size=(640, 640))
+        self.face_model.models = {key: value for key, value in self.face_model.models.items(
+        ) if key in ['detection', 'recognition']}
         self.id_mapping = {}
         self.name_mapping = ""
         self.DETECT_THRESHOLD = 0.6
