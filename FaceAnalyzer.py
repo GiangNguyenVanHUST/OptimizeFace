@@ -88,8 +88,6 @@ class Analyzer:
         """
         results = []
 
-        status = 'PROCESSING'
-
         cap = CamGear(source=video_path).start()
         frame_rate = cap.framerate
 
@@ -202,4 +200,4 @@ class Analyzer:
                 analysis_length = time.time() - start_time
                 print(f"[INFO] finished video analysis in {analysis_length}")
 
-        return results, status
+        return results
