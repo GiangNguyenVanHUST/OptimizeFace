@@ -4,7 +4,7 @@
 
 Module FaceAnalyzer này giải quyết bài toán nhận diện khuôn mặt trong một video đã cho trước. Cụ thể hơn, module này có thể xác định được khi nào một nhân vật xuất hiện và rời khỏi khung hình trong một video đã cho trước.
 
-Module này gồm một class `Analyzer`, có khả năng nhận diện và nhận dạng khuôn mặt trong một video đã cho trước. 
+Module này gồm một class `Analyzer`, có khả năng nhận diện và nhận dạng khuôn mặt trong một video đã cho trước.
 
 ## II. Hướng dẫn sử dụng
 
@@ -33,8 +33,6 @@ analyzer = Analyzer()
 analyzer.embedding_extract("images", "images")
 analyzer.analyze("video.mp4", 'dossier', "video")
 ```
-
-
 
 ### 3. Chạy thử code
 
@@ -73,7 +71,7 @@ Khi sử dụng cấu trúc thư mục này, module sẽ hiểu là ảnh A1.jpg
 
 #### Lưu ý về Insightface
 
-Khi khởi tạo Insightface, thư viện này sẽ initialize tất cả các model nó nhìn thấy trong thư mục ~/.insightface, *kể cả những model ta không sử dụng.* Để tăng tốc quá trình khởi tạo Insightface, ta có thể làm một trong hai cách sau.
+Khi khởi tạo Insightface, thư viện này sẽ initialize tất cả các model nó nhìn thấy trong thư mục ~/.insightface, _kể cả những model ta không sử dụng._ Để tăng tốc quá trình khởi tạo Insightface, ta có thể làm một trong hai cách sau.
 
 1. Xoá hết tất cả các file trong thư mục `~/.insightface/models/buffalo_l`, chỉ để lại hai file `det_10g.onnx` và `w600_r50.onnx`
 
@@ -83,6 +81,14 @@ Khi khởi tạo Insightface, thư viện này sẽ initialize tất cả các m
    if model.taskname != 'detection' and model.taskname != 'recognition':
        continue
    ```
+
+### 5. Biên dịch về dạng mã nhị phân
+
+Để biên dịch module FaceAnalyzer về dạng mã nhị phân, trong Terminal, chạy câu lệnh sau đây
+
+```shell
+python compile.py build_ext --inplace
+```
 
 ## III. Cải tiến
 

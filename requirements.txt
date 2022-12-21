@@ -1,8 +1,10 @@
 annoy==1.17.1
+Cython==0.29.32
 imutils==0.5.4
 insightface==0.7.1
 onnx==1.13.0
 onnxruntime==1.13.1
 opencv-python==4.5.5.64
+packaging==22.0
 tqdm==4.64.0
 vidgear==0.2.6
