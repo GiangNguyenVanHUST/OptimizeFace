@@ -1,8 +1,8 @@
-# OptimizeFace
+# FaceAnalyzer
 
 ## I. Giới thiệu
 
-Module OptimizeFace này giải quyết bài toán nhận diện khuôn mặt trong một video đã cho trước. Cụ thể hơn, module này có thể xác định được khi nào một nhân vật xuất hiện và rời khỏi khung hình trong một video đã cho trước.
+Module FaceAnalyzer này giải quyết bài toán nhận diện khuôn mặt trong một video đã cho trước. Cụ thể hơn, module này có thể xác định được khi nào một nhân vật xuất hiện và rời khỏi khung hình trong một video đã cho trước.
 
 Module này gồm một class `Analyzer`, có khả năng nhận diện và nhận dạng khuôn mặt trong một video đã cho trước. 
 
@@ -18,12 +18,30 @@ Module này sử dụng một số thư viện bên ngoài, bao gồm insightfac
 pip install -r requirements.txt
 ```
 
-### 2. Chạy thử code
+### 2. Sử dụng module
 
-Để chạy thử file video.py trong module này, ta có thể sử dụng câu lệnh sau đây
+Để sử dụng class Analyzer của module này, bạn có thể import class Analyzer như sau
+
+```python
+from FaceAnalyzer import Analyzer
+```
+
+Với hình ảnh ở thư mục có tên `images`, và video cần phân tích ở path `video.mp4`, bạn có thể bắt đầu quá trình nhận diện và nhận dạng gương mặt như sau:
+
+```py
+analyzer = Analyzer()
+analyzer.embedding_extract("images", "images")
+analyzer.analyze("video.mp4", 'dossier', "video")
+```
+
+
+
+### 3. Chạy thử code
+
+Để chạy thử file module_test trong module này, ta có thể sử dụng câu lệnh sau đây
 
 ```bash
-python video.py <img_folder> <video_path> [<video_id>]
+python module_test.py <img_folder> <video_path> [<video_id>]
 ```
 
 Ta cần phải truyền ít nhất 2 command-line arguments theo thứ tự như sau:
@@ -32,9 +50,9 @@ Ta cần phải truyền ít nhất 2 command-line arguments theo thứ tự nh�
 - video_path: command-line argument thứ 2 sau video.py. Đây là path dẫn tới video mà chúng ta cần xử lý.
 - video_id: command-line argument thứ 3 sau video.py, không bắt buộc. Đây là id của video; trong trường hợp chúng ta để trống, giá trị mặc định của video_id sẽ là giá trị của img_folder.
 
-Notebook `notebook.ipynb` có thông tin chi tiết hơn về hai method có trong class Analyzer.
+Notebook `notebook.ipynb` có thông tin chi tiết hơn về hai method có trong class `Analyzer`.
 
-### 3. Lưu ý
+### 4. Lưu ý
 
 Cấu trúc của thư mục chứa ảnh khuôn mặt các nhân vật mà ta cần nhận diện như sau:
 
