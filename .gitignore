@@ -139,3 +139,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 notebook_text.md
+rename_files.py
+short_hamilton_clip.mp4
+test.py
+numpty_test.py
+dossier_tracked.log
+dossier.log
+image.ipynb
+script.py
