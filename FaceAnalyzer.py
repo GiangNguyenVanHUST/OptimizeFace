@@ -1,5 +1,4 @@
 import insightface
-from insightface.app import FaceAnalysis
 from imutils import paths
 import cv2
 import os
@@ -9,7 +8,6 @@ import uuid
 from tqdm import tqdm
 from vidgear.gears import CamGear, WriteGear
 import time
-from sys import argv
 
 
 class Analyzer:
@@ -48,7 +46,7 @@ class Analyzer:
         self.annoy.build(200)
         print("[DEBUG] extract successful")
 
-    def analyze(self, video_path, sub_dir, video_id='', outputs_video=False):
+    def analyze(self, video_path, sub_dir, video_id='', outputs_video=False, output_folder=None):
         """ Analyze a given video
 
         Args:
@@ -66,8 +64,10 @@ class Analyzer:
         cap = CamGear(source=video_path).start()
         frame_rate = cap.framerate
 
-        if not os.path.exists('output'):
-            os.mkdir('output')
+        output_destination = output_folder if output_folder else 'output'
+
+        if not os.path.exists(output_destination):
+            os.mkdir(output_destination)
 
         if outputs_video:
             font = cv2.FONT_HERSHEY_DUPLEX
@@ -77,7 +77,7 @@ class Analyzer:
             print('video_name:', video_name)
 
             output_movie = WriteGear(
-                output_filename=f"./output/{video_name}_output.mp4")
+                output_filename=f"./{output_destination}/{video_name}_output.mp4")
 
         start_time = time.time()
 
@@ -152,8 +152,6 @@ class Analyzer:
                                 if outputs_video:
                                     cv2.rectangle(frame, (left * 4, top * 4),
                                                   (right * 4, bottom * 4), (0, 255, 0), 2)
-                                    cv2.rectangle(frame, (left * 4, bottom * 4 + 10),
-                                                  (right * 4, bottom * 4), (0, 255, 0), cv2.FILLED)
                                     cv2.putText(frame, dossier_id, (left * 4 + 6, bottom * 4 - 6),
                                                 font, 0.5, (255, 255, 255), 1)
 
@@ -161,7 +159,6 @@ class Analyzer:
                             if person not in seen_faces:
                                 print(
                                     f'{person} left screen at {frame_id / frame_rate}', file=f)
-                                # del tagged_trackers[person]
 
                         on_screen = seen_faces
 
