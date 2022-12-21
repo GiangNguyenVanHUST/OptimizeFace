@@ -1,3 +1,14 @@
+dossier/
+annotated/
+lesserafim/
+output.mp4
+antifragile_leak.mp4
+output.mp4
+short_antifragile.mp4
+input_1.jpg
+input_2.jpg
+given_code
+data
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -127,3 +138,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+notebook_text.md
+rename_files.py
+short_hamilton_clip.mp4
+test.py
+numpty_test.py
+dossier_tracked.log
+dossier.log
+image.ipynb
+script.py
+video.py

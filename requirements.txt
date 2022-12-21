@@ -1,0 +1,8 @@
+annoy==1.17.1
+imutils==0.5.4
+insightface==0.7.1
+onnx==1.13.0
+onnxruntime==1.13.1
+opencv-python==4.5.5.64
+tqdm==4.64.0
+vidgear==0.2.6
