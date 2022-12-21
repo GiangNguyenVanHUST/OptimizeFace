@@ -84,8 +84,6 @@ Khi khởi tạo Insightface, thư viện này sẽ initialize tất cả các m
        continue
    ```
 
-   
-
 ## III. Cải tiến
 
 So với đoạn code ban đầu, code trong file `video.py` có những cải tiến sau:
