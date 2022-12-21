@@ -8,11 +8,15 @@ import uuid
 from tqdm import tqdm
 from vidgear.gears import CamGear, WriteGear
 import time
+import FaceAnalyzerConfig
 
 
 class Analyzer:
-    def __init__(self, f=512):
-        self.f = 512
+    def __init__(self,
+                 f=FaceAnalyzerConfig.ANNOY_DEFAULT_F,
+                 threshold=FaceAnalyzerConfig.DET_SCORE_THRESHOLD,
+                 min_similarity=FaceAnalyzerConfig.MIN_SIMILARITY):
+        self.f = f
         self.annoy = AnnoyIndex(f, 'angular')
         self.face_model = insightface.app.FaceAnalysis()
         self.face_model.prepare(ctx_id=-1, det_size=(640, 640))
@@ -20,7 +24,9 @@ class Analyzer:
         ) if key in ['detection', 'recognition']}
         self.id_mapping = {}
         self.name_mapping = ""
-        self.DETECT_THRESHOLD = 0.6
+        self.font = FaceAnalyzerConfig.FONT
+        self.DETECT_THRESHOLD = threshold
+        self.MIN_SIMILARITY = min_similarity
 
     def embedding_extract(self, imgs_folder, id2name):
         """
@@ -58,7 +64,12 @@ class Analyzer:
         self.annoy.build(200)
         print("[DEBUG] extract successful")
 
-    def analyze(self, video_path, sub_dir, video_id='', outputs_video=False, output_folder=None):
+    def analyze(self,
+                video_path,
+                sub_dir,
+                video_id='',
+                outputs_video=False,
+                output_folder=None):
         """
         Analyze a given video
 
@@ -91,20 +102,14 @@ class Analyzer:
         cap = CamGear(source=video_path).start()
         frame_rate = cap.framerate
 
-        output_destination = output_folder if output_folder else 'output'
-
         if not os.path.exists(output_destination):
             os.mkdir(output_destination)
 
         if outputs_video:
-            font = cv2.FONT_HERSHEY_DUPLEX
-            video_file = video_path.split('/')[-1]
-            video_name_tokens = video_file.split('.')[:-1]
-            video_name = ".".join(video_name_tokens)
-            print('video_name:', video_name)
-
+            output_destination = output_folder if output_folder else 'output'
+            output_name = video_id if len(video_id) else str(uuid.uuid4())
             output_movie = WriteGear(
-                output_filename=f"./{output_destination}/{video_name}_output.mp4")
+                output_filename=f"./{output_destination}/{output_name}_output.mp4")
 
         start_time = time.time()
 
@@ -143,7 +148,7 @@ class Analyzer:
                         seen_faces = set()
 
                         for face in faces:
-                            if face.det_score < 0.6:
+                            if face.det_score < self.DETECT_THRESHOLD:
                                 continue
 
                             # NOTE - bounding box for the face
@@ -155,18 +160,17 @@ class Analyzer:
                                 embedding, n=1, include_distances=True)
                             similarity = (2. - distances[0] ** 2) / 2.
 
-                            if similarity >= 0.2:
+                            if similarity >= self.MIN_SIMILARITY:
                                 crop_img = small_frame[top:bottom, left:right]
                                 dossier_id = self.id_mapping[str(
                                     closest_indices[0])]
                                 seen_faces.add(dossier_id)
 
                                 if dossier_id not in on_screen:
-                                    print(
-                                        f'{dossier_id} on screen since {frame_id / frame_rate}', file=f)
+                                    print(f'{dossier_id} on screen since {frame_id / frame_rate}',
+                                          file=f)
                                     on_screen.add(dossier_id)
-                                    filename = dossier_id + '_' + \
-                                        str(uuid.uuid4()) + '.jpg'
+                                    filename = f'{dossier_id}_{str(uuid.uuid4())}.jpg'
                                     path_to_save = os.path.join(
                                         sub_dir, filename)
                                     writer = WriteGear(
@@ -180,7 +184,7 @@ class Analyzer:
                                     cv2.rectangle(frame, (left * 4, top * 4),
                                                   (right * 4, bottom * 4), (0, 255, 0), 2)
                                     cv2.putText(frame, dossier_id, (left * 4 + 6, bottom * 4 - 6),
-                                                font, 0.5, (255, 255, 255), 1)
+                                                self.font, 0.5, (255, 255, 255), 1)
 
                         for person in on_screen:
                             if person not in seen_faces:
