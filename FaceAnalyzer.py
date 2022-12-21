@@ -23,6 +23,18 @@ class Analyzer:
         self.DETECT_THRESHOLD = 0.6
 
     def embedding_extract(self, imgs_folder, id2name):
+        """
+        Create embeddings based on a set of images.
+
+        Parameters
+        ---
+        imgs_folder: str
+            Name of directory storing the images
+
+        id2name: str
+            Name of name mapping
+
+        """
         self.name_mapping = id2name
         count = 0
 
@@ -47,15 +59,32 @@ class Analyzer:
         print("[DEBUG] extract successful")
 
     def analyze(self, video_path, sub_dir, video_id='', outputs_video=False, output_folder=None):
-        """ Analyze a given video
+        """
+        Analyze a given video
 
-        Args:
-            video_path  : video full path
-            sub_dir     : where to save dossier images found
-            video_id    : ID of video
+        Parameters
+        ---
+        video_path: str
+            Full path to video file
 
-        Returns:
-            results     : List<(dossier_id/name, image_path)>
+        sub_dir: str
+            Folder to save dossier images in
+
+        video_id: str, optional
+            ID of video. Defaults to ''
+
+        outputs_video: bool, str
+            If True, outputs annotated video. Defaults to False
+
+        output_folder: str
+            Folder to save output video in. If value is None, output folder will be named 'output'. Defaults to None
+
+        Return
+        ---
+        A list of tuples, whose ordered elements are as followed:
+            - The first element: name of person who appeared in the video
+            - The second element: path to dossier image
+            - The third element: timestamp of the corresponding dossier image.
         """
         results = []
 
