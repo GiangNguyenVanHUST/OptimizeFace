@@ -28,7 +28,7 @@ class Analyzer:
         self.DETECT_THRESHOLD = threshold
         self.MIN_SIMILARITY = min_similarity
 
-    def embedding_extract(self, imgs_folder, id2name):
+    def embedding_extract(self, imgs_folder: str, id2name: str):
         """
         Create embeddings based on a set of images.
 
@@ -65,8 +65,8 @@ class Analyzer:
         print("[DEBUG] extract successful")
 
     def analyze(self,
-                video_path,
-                sub_dir,
+                video_path: str,
+                sub_dir: str,
                 video_id='',
                 outputs_video=False,
                 output_folder=None):
@@ -102,106 +102,84 @@ class Analyzer:
         cap = CamGear(source=video_path).start()
         frame_rate = cap.framerate
 
-        if not os.path.exists(output_destination):
-            os.mkdir(output_destination)
-
         if outputs_video:
             output_destination = output_folder if output_folder else 'output'
+            if not os.path.exists(output_destination):
+                os.mkdir(output_destination)
+
             output_name = video_id if len(video_id) else str(uuid.uuid4())
             output_movie = WriteGear(
                 output_filename=f"./{output_destination}/{output_name}_output.mp4")
 
         start_time = time.time()
-
         captured = 0
         frame_id = 0
         on_screen = set()
 
-        with open('dossier.log', 'w') as f:
-            try:
-                while 1:
-                    frame = cap.read()
+        try:
+            while 1:
+                frame = cap.read()
+                if frame is None:
+                    print('end')
+                    break
 
-                    if frame is None:
-                        print('end')
-                        break
+                frame_id += 1
+                if frame_id % 5 == 0:
+                    captured += 1
+                    small_frame = cv2.resize(
+                        frame, (0, 0), fx=0.25, fy=0.25)
+                    faces = self.face_model.get(small_frame)
 
-                    frame_id += 1
-
-                    if frame_id % 5 == 0:
-                        captured += 1
-                        # evaluate bottleneck
-                        small_frame = cv2.resize(
-                            frame, (0, 0), fx=0.25, fy=0.25)
-                        faces = self.face_model.get(small_frame)
-
-                        if len(faces) <= 0:
-                            if outputs_video:
-                                output_movie.write(frame)
-                            continue
-
-                        if len(faces) > 0:
-                            timestamp = time.time() - start_time
-                            print(
-                                f'[{frame_id}] identified {len(faces)} faces at {timestamp}')
-
-                        seen_faces = set()
-
-                        for face in faces:
-                            if face.det_score < self.DETECT_THRESHOLD:
-                                continue
-
-                            # NOTE - bounding box for the face
-                            left, top, right, bottom = tuple(
-                                face.bbox.astype(int).flatten())
-
-                            embedding = face.embedding.flatten()
-                            closest_indices, distances = self.annoy.get_nns_by_vector(
-                                embedding, n=1, include_distances=True)
-                            similarity = (2. - distances[0] ** 2) / 2.
-
-                            if similarity >= self.MIN_SIMILARITY:
-                                crop_img = small_frame[top:bottom, left:right]
-                                dossier_id = self.id_mapping[str(
-                                    closest_indices[0])]
-                                seen_faces.add(dossier_id)
-
-                                if dossier_id not in on_screen:
-                                    print(f'{dossier_id} on screen since {frame_id / frame_rate}',
-                                          file=f)
-                                    on_screen.add(dossier_id)
-                                    filename = f'{dossier_id}_{str(uuid.uuid4())}.jpg'
-                                    path_to_save = os.path.join(
-                                        sub_dir, filename)
-                                    writer = WriteGear(
-                                        output_filename=path_to_save, compression_mode=False)
-                                    writer.write(crop_img)
-                                    timecode = frame_id / frame_rate
-                                    results.append(
-                                        (dossier_id, path_to_save, timecode))
-
-                                if outputs_video:
-                                    cv2.rectangle(frame, (left * 4, top * 4),
-                                                  (right * 4, bottom * 4), (0, 255, 0), 2)
-                                    cv2.putText(frame, dossier_id, (left * 4 + 6, bottom * 4 - 6),
-                                                self.font, 0.5, (255, 255, 255), 1)
-
-                        for person in on_screen:
-                            if person not in seen_faces:
-                                print(
-                                    f'{person} left screen at {frame_id / frame_rate}', file=f)
-
-                        on_screen = seen_faces
-
+                    if len(faces) <= 0:
                         if outputs_video:
                             output_movie.write(frame)
-            finally:
-                cap.stop()
+                        continue
 
-                if outputs_video:
-                    output_movie.close()
+                    if len(faces) > 0:
+                        time_duration = time.time() - start_time
+                        print(
+                            f'[{frame_id}] identified {len(faces)} faces at {time_duration}')
 
-                analysis_length = time.time() - start_time
-                print(f"[INFO] finished video analysis in {analysis_length}")
+                    for face in faces:
+                        if face.det_score < self.DETECT_THRESHOLD:
+                            continue
+
+                        left, top, right, bottom = tuple(
+                            face.bbox.astype(int).flatten())
+                        embedding = face.embedding.flatten()
+                        closest_indices, distances = self.annoy.get_nns_by_vector(
+                            embedding, n=1, include_distances=True)
+                        similarity = (2. - distances[0] ** 2) / 2.
+
+                        if similarity >= self.MIN_SIMILARITY:
+                            crop_img = small_frame[top:bottom, left:right]
+                            dossier_id = self.id_mapping[str(
+                                closest_indices[0])]
+
+                            if dossier_id not in on_screen:
+                                filename = f'{dossier_id}_{str(uuid.uuid4())}.jpg'
+                                path_to_save = os.path.join(
+                                    sub_dir, filename)
+                                writer = WriteGear(
+                                    output_filename=path_to_save, compression_mode=False)
+                                writer.write(crop_img)
+                                timecode = frame_id / frame_rate
+                                results.append(
+                                    (dossier_id, path_to_save, timecode))
+
+                            if outputs_video:
+                                cv2.rectangle(frame, (left * 4, top * 4),
+                                              (right * 4, bottom * 4), (0, 255, 0), 2)
+                                cv2.putText(frame, dossier_id, (left * 4 + 6, bottom * 4 - 6),
+                                            self.font, 0.5, (255, 255, 255), 1)
+
+                    if outputs_video:
+                        output_movie.write(frame)
+        finally:
+            cap.stop()
+            if outputs_video:
+                output_movie.close()
+            analysis_length = time.time() - start_time
+            print(f"[INFO] finished video analysis in {analysis_length}")
 
         return results

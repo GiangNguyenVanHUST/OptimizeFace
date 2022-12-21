@@ -54,6 +54,8 @@ Notebook `notebook.ipynb` có thông tin chi tiết hơn về hai method có tro
 
 ### 4. Lưu ý
 
+#### Cấu trúc thư mục ảnh
+
 Cấu trúc của thư mục chứa ảnh khuôn mặt các nhân vật mà ta cần nhận diện như sau:
 
 ```
@@ -68,6 +70,21 @@ Cấu trúc của thư mục chứa ảnh khuôn mặt các nhân vật mà ta c
 ```
 
 Khi sử dụng cấu trúc thư mục này, module sẽ hiểu là ảnh A1.jpg và A2.jpg chứa khuôn mặt của nhân vật A, B1.jpg và B2.jpg chứa khuôn mặt của nhân vật B, v.v..
+
+#### Lưu ý về Insightface
+
+Khi khởi tạo Insightface, thư viện này sẽ initialize tất cả các model nó nhìn thấy trong thư mục ~/.insightface, *kể cả những model ta không sử dụng.* Để tăng tốc quá trình khởi tạo Insightface, ta có thể làm một trong hai cách sau.
+
+1. Xoá hết tất cả các file trong thư mục `~/.insightface/models/buffalo_l`, chỉ để lại hai file `det_10g.onnx` và `w600_r50.onnx`
+
+2. Edit code của insightface: Trong file `ínsightface/app/face_analysis.py`, trong method `__init__` của class `FaceAnalysis`, sau dòng `model = model_zoo.get_model(onnx_file, **kwargs)`, thêm hai dòng nữa như sau:
+
+   ```py
+   if model.taskname != 'detection' and model.taskname != 'recognition':
+       continue
+   ```
+
+   
 
 ## III. Cải tiến
 
