@@ -60,13 +60,13 @@ Cấu trúc của thư mục chứa ảnh khuôn mặt các nhân vật mà ta c
 
 ```
 <dataset>/
-	A/
-		A1.jpg
-		A2.jpg
-	B/
-		B1.jpg
-		B2.jpg
-	...
+  A/
+    A1.jpg
+    A2.jpg
+  B/
+    B1.jpg
+    B2.jpg
+  ...
 ```
 
 Khi sử dụng cấu trúc thư mục này, module sẽ hiểu là ảnh A1.jpg và A2.jpg chứa khuôn mặt của nhân vật A, B1.jpg và B2.jpg chứa khuôn mặt của nhân vật B, v.v..
